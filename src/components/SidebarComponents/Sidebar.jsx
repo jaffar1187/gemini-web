@@ -1,41 +1,74 @@
-import React from 'react'
-import "./Sidebar.css"
-import {assets} from "../../assets/assets"
-
+import React, { useContext, useState } from "react";
+import "./Sidebar.css";
+import { assets } from "../../assets/assets";
+import { Context } from "../../context/Content";
 
 const Sidebar = () => {
-  return (
-    <div className='sidebar'>
-      <div className="top">
-        <img className = "menu" src={assets.menu_icon} alt="" />
-        <div className="new-chat">
-          <img src={assets.plus_icon} alt="" />
-          <p>New Chat</p>
-        </div><div className="recent">
-          <p className="recent-title">Recent</p>
-          <div className="recent-entry">
-            <img src={assets.message_icon} alt="" />
-            <p>What is react ...</p>
-          </div>
-        </div>
+  const [extended, setExtended] = useState(false);
+  const { onSent, previousrompt, setRecentPrompt, setLoading, setShowResult } =
+    useContext(Context);
 
+  const handleExtended = () => {
+    setExtended(!extended);
+  };
+
+  const loadRecentData = async (prompt) => {
+    await onSent(prompt);
+  };
+
+  const homepage = () => {
+    setLoading(false);
+    setShowResult(false);
+  };
+
+  return (
+    <div className="sidebar">
+      <div className="top">
+        <img
+          className="menu"
+          src={assets.menu_icon}
+          alt=""
+          onClick={handleExtended}
+        />
+        <div className="new-chat" onClick={homepage}>
+          <img src={assets.plus_icon} alt="" />
+          {extended && <p>New Chat</p>}
+        </div>
+        <div className="recent">
+          {extended && <p className="recent-title">Recent</p>}
+          {previousrompt.map((item, index) => {
+            return (
+              <div
+                className="recent-entry"
+                key={index}
+                onClick={async () => await loadRecentData(item)}
+              >
+                {extended && <img src={assets.message_icon} alt="" />}
+                {extended && (
+                  <p>{item.length > 16 ? item.slice(0, 16) + " ..." : item}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
+
       <div className="bottom">
         <div className="bottom-item recent-entry">
           <img src={assets.question_icon} alt="" />
-          <p>Help</p>
+          {extended && <p>Help</p>}
         </div>
-         <div className="bottom-item recent-entry">
+        <div className="bottom-item recent-entry">
           <img src={assets.history_icon} alt="" />
-          <p>Activity</p>
+          {extended && <p>Activity</p>}
         </div>
-         <div className="bottom-item recent-entry">
+        <div className="bottom-item recent-entry">
           <img src={assets.setting_icon} alt="" />
-          <p>Settings</p>
+          {extended && <p>Settings</p>}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;
